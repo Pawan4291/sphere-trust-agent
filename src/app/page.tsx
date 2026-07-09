@@ -80,21 +80,26 @@ export default function ConnectPage() {
     try {
       // Dynamic import of sphere-sdk connect module (browser-only)
       const { autoConnect } = await import(
-        "@unicitylabs/sphere-sdk/connect/browser"
-      );
-      const { SPHERE_NETWORKS } = await import(
-        "@unicitylabs/sphere-sdk/connect"
-      );
+  "@unicitylabs/sphere-sdk/connect/browser"
+);
+const { SPHERE_NETWORKS, PERMISSION_SCOPES } = await import(
+  "@unicitylabs/sphere-sdk/connect"
+);
 
-      const result = await autoConnect({
-        dapp: {
-          name: "Unicity Trust Score Agent",
-          url: location.origin,
-        },
-        walletUrl: SPHERE_WALLET_URL,
-        network: SPHERE_NETWORKS.testnet2,
-        silent: false,
-      });
+const result = await autoConnect({
+  dapp: {
+    name: "Unicity Trust Score Agent",
+    url: location.origin,
+  },
+  walletUrl: SPHERE_WALLET_URL,
+  network: SPHERE_NETWORKS.testnet2,
+  silent: false,
+  permissions: [
+    PERMISSION_SCOPES.HISTORY_READ,
+    PERMISSION_SCOPES.EVENTS_SUBSCRIBE,
+    PERMISSION_SCOPES.RESOLVE_PEER,
+  ],
+});
 
       const conn = result.connection;
       const id: ConnectResult = {
