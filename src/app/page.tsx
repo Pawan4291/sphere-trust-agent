@@ -156,10 +156,12 @@ const result = await autoConnect({
           }),
         });
 
-       const tag = id.nametag || id.directAddress || "unknown";
-        await new Promise((r) => setTimeout(r, 1000)); // let connection handshake settle
+      const tag = id.nametag || id.directAddress || "unknown";
+        await new Promise((r) => setTimeout(r, 1000));
         await syncHistory(result.client, tag);
-        syncIntervalRef.current = setInterval(() => syncHistory(result.client, tag), 30000);
+        syncIntervalRef.current = setInterval(() => {
+          if (clientRef.current) syncHistory(clientRef.current, tag);
+        }, 30000);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
