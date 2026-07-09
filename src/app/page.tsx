@@ -40,7 +40,7 @@ export default function ConnectPage() {
 
     do {
         page = await client.query("sphere_getHistory", { limit: 200, cursor });
-        console.log("RAW PAGE:", page);
+        console.log("FULL ENTRY:", JSON.stringify(page[0], null, 2));
         const items = Array.isArray(page) ? page : page.items || page.history || [];
         allHistory = allHistory.concat(items);
         cursor = page?.nextCursor || page?.cursor;
