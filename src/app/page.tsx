@@ -29,7 +29,7 @@ export default function ConnectPage() {
   const [typedText, setTypedText] = useState("");
   const popupRef = useRef<Window | null>(null);
   const sessionKey = "sphere-trust-session";
-  const clientRef = useRef<unknown>(null);
+  const clientRef = useRef<{ disconnect: () => Promise<void> } | null>(null);
 
   const heroText = "AUTONOMOUS TRUST SCORING ON UNICITY TESTNET2";
   
