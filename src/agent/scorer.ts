@@ -16,18 +16,21 @@ export interface WalletScore {
   total: number;
 }
 
-function computeScore(events: { outcome: string; detectedAt: Date | null }[]): number {
-  const completed = events.filter((e) => e.outcome === "completed").length;
+async function computeScore(wallet: string, completed: number): Promise<number> {
   if (completed === 0) return 0;
 
-  const volumeScore = Math.min(50, completed * 3);
-  const recentDays = events.filter(
-    (e) => e.detectedAt !== null && (Date.now() - new Date(e.detectedAt).getTime()) / 86400000 <= 30
-  ).length;
-  const recencyScore = Math.min(30, recentDays * 2);
-  const consistencyScore = Math.min(20, Math.floor(completed / 5) * 5);
+  // Find the current highest trade count across ALL wallets
+  const maxResult = await db.execute(sql`
+    SELECT MAX(cnt) as max_completed FROM (
+      SELECT COUNT(*) as cnt FROM trade_event
+      WHERE outcome = 'completed'
+      GROUP BY wallet_a
+    ) sub
+  `);
+  const maxCompleted = Number((maxResult.rows[0] as { max_completed: string })?.max_completed || completed);
 
-  return Math.min(100, volumeScore + recencyScore + consistencyScore);
+  // Relative score: top wallet = 100, others scaled proportionally
+  return Math.round((completed / Math.max(maxCompleted, 1)) * 100);
 }
 
 export async function recalculateScore(
@@ -48,7 +51,7 @@ export async function recalculateScore(
   const completed = events.filter((e) => e.outcome === "completed").length;
   const abandoned = 0; // not measurable from wallet history
   const total = completed;
-  const score = computeScore(events);
+  const score = await computeScore(wallet, completed);
 
   // Write new score to history
   await db.insert(scoreHistory).values({
