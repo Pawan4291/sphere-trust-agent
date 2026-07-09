@@ -16,6 +16,20 @@ export interface WalletScore {
   total: number;
 }
 
+function computeScore(events: { outcome: string; detectedAt: Date | null }[]): number {
+  const completed = events.filter((e) => e.outcome === "completed").length;
+  if (completed === 0) return 0;
+
+  const volumeScore = Math.min(50, completed * 3);
+  const recentDays = events.filter(
+    (e) => e.detectedAt !== null && (Date.now() - new Date(e.detectedAt).getTime()) / 86400000 <= 30
+  ).length;
+  const recencyScore = Math.min(30, recentDays * 2);
+  const consistencyScore = Math.min(20, Math.floor(completed / 5) * 5);
+
+  return Math.min(100, volumeScore + recencyScore + consistencyScore);
+}
+
 export async function recalculateScore(
   wallet: string,
   reasonTxId: string
@@ -24,6 +38,7 @@ export async function recalculateScore(
   const events = await db
     .select({
       outcome: tradeEvent.outcome,
+      detectedAt: tradeEvent.detectedAt,
     })
     .from(tradeEvent)
     .where(
@@ -31,11 +46,9 @@ export async function recalculateScore(
     );
 
   const completed = events.filter((e) => e.outcome === "completed").length;
-  const abandoned = events.filter((e) => e.outcome === "abandoned").length;
-  const total = completed + abandoned;
-
-  // score = (completed / total) * 100, clamped to 0–100
-  const score = total === 0 ? 0 : Math.round((completed / total) * 100);
+  const abandoned = 0; // not measurable from wallet history
+  const total = completed;
+  const score = computeScore(events);
 
   // Write new score to history
   await db.insert(scoreHistory).values({

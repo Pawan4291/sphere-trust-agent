@@ -36,11 +36,7 @@ export function classify(transfer: TransferRecord): TradeOutcome {
     return "completed";
   }
 
-  // Failed or no counterparty = abandoned
-  if (status === "failed" || !walletB) {
-    return "abandoned";
-  }
-
-  // Default: abandoned for any unknown states
-  return "abandoned";
+  // sphere_getHistory only returns real completed SENT/RECEIVED transfers —
+  // there is no "abandoned" case in this data source.
+  return "completed";
 }
