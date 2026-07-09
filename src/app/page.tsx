@@ -182,7 +182,14 @@ const result = await autoConnect({
     }, 500);
   };
 
-  const disconnect = () => {
+  const disconnect = async () => {
+    try {
+      if (clientRef.current) {
+        await clientRef.current.disconnect();
+      }
+    } catch (err) {
+      console.error("Error disconnecting:", err);
+    }
     setIdentity(null);
     setConnState("idle");
     localStorage.removeItem(sessionKey);
