@@ -19,17 +19,18 @@ export async function GET(
   }
 
   // Get trade events for this wallet
-  const events = await db
+  const allEvents = await db
     .select()
     .from(tradeEvent)
     .where(
       sql`${tradeEvent.walletA} = ${"@" + cleanTag} OR ${tradeEvent.walletB} = ${"@" + cleanTag}`
     )
-    .orderBy(desc(tradeEvent.detectedAt))
-    .limit(50);
+    .orderBy(desc(tradeEvent.detectedAt));
 
-  const completed = events.filter((e) => e.outcome === "completed").length;
-  const abandoned = events.filter((e) => e.outcome === "abandoned").length;
+  const events = allEvents.slice(0, 50);
+
+  const completed = allEvents.filter((e) => e.outcome === "completed").length;
+  const abandoned = allEvents.filter((e) => e.outcome === "abandoned").length;
   const total = completed + abandoned;
   const score = total === 0 ? null : Math.round((completed / total) * 100);
 
