@@ -32,13 +32,23 @@ export default function ConnectPage() {
   const clientRef = useRef<{ disconnect: () => Promise<void>; query: (m: string) => Promise<unknown> } | null>(null);
   const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const syncHistory = async (client: { query: (m: string) => Promise<unknown> }, tag: string) => {
+  const syncHistory = async (client: { query: (m: string, params?: any) => Promise<unknown> }, tag: string) => {
     try {
-      const history = await client.query("sphere_getHistory");
+      let allHistory: any[] = [];
+      let cursor: string | undefined = undefined;
+      let page: any;
+
+      do {
+        page = await client.query("sphere_getHistory", { limit: 200, cursor });
+        const items = Array.isArray(page) ? page : page.items || page.history || [];
+        allHistory = allHistory.concat(items);
+        cursor = page?.nextCursor || page?.cursor;
+      } while (cursor && allHistory.length < 2000);
+
       await fetch("/api/wallet/backfill", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nametag: tag, history }),
+        body: JSON.stringify({ nametag: tag, history: allHistory }),
       });
     } catch (err) {
       console.error("Sync failed:", err);
