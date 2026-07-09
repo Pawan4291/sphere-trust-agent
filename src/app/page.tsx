@@ -32,7 +32,7 @@ export default function ConnectPage() {
   const clientRef = useRef<{ disconnect: () => Promise<void>; query: (m: string) => Promise<unknown> } | null>(null);
   const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const syncHistory = async (client: { query: (m: string, params?: any) => Promise<unknown> }, tag: string) => {
+  const syncHistory = async (client: { query: (m: string, params?: any) => Promise<unknown> }, tag: string, retried = false) => {
     try {
       let allHistory: any[] = [];
       let cursor: string | undefined = undefined;
@@ -53,7 +53,12 @@ export default function ConnectPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nametag: tag, history: allHistory }),
       });
-    } catch (err) {
+   } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!retried && msg.includes("Not connected")) {
+        await new Promise((r) => setTimeout(r, 1500));
+        return syncHistory(client, tag, true);
+      }
       console.error("Sync failed:", err);
     }
   };
@@ -151,7 +156,8 @@ const result = await autoConnect({
           }),
         });
 
-        const tag = id.nametag || id.directAddress || "unknown";
+       const tag = id.nametag || id.directAddress || "unknown";
+        await new Promise((r) => setTimeout(r, 1000)); // let connection handshake settle
         await syncHistory(result.client, tag);
         syncIntervalRef.current = setInterval(() => syncHistory(result.client, tag), 30000);
       }

@@ -262,19 +262,13 @@ export default function MyScorePage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       {[
                         {
                           label: "Completed",
                           value: scoreData.completed,
                           color: "#22c55e",
                           bg: "rgba(34,197,94,0.1)",
-                        },
-                        {
-                          label: "Abandoned",
-                          value: scoreData.abandoned,
-                          color: "#ef4444",
-                          bg: "rgba(239,68,68,0.1)",
                         },
                         {
                           label: "Total Trades",
