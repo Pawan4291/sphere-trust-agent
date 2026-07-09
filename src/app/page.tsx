@@ -29,7 +29,21 @@ export default function ConnectPage() {
   const [typedText, setTypedText] = useState("");
   const popupRef = useRef<Window | null>(null);
   const sessionKey = "sphere-trust-session";
-  const clientRef = useRef<{ disconnect: () => Promise<void> } | null>(null);
+  const clientRef = useRef<{ disconnect: () => Promise<void>; query: (m: string) => Promise<unknown> } | null>(null);
+  const syncIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const syncHistory = async (client: { query: (m: string) => Promise<unknown> }, tag: string) => {
+    try {
+      const history = await client.query("sphere_getHistory");
+      await fetch("/api/wallet/backfill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nametag: tag, history }),
+      });
+    } catch (err) {
+      console.error("Sync failed:", err);
+    }
+  };
 
   const heroText = "AUTONOMOUS TRUST SCORING ON UNICITY TESTNET2";
   
@@ -124,16 +138,9 @@ const result = await autoConnect({
           }),
         });
 
-        // Pull this wallet's REAL past history (granted via HISTORY_READ) and backfill it
-        const history = await result.client.query("sphere_getHistory");
-        await fetch("/api/wallet/backfill", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            nametag: id.nametag || id.directAddress || "unknown",
-            history,
-          }),
-        });
+        const tag = id.nametag || id.directAddress || "unknown";
+        await syncHistory(result.client, tag);
+        syncIntervalRef.current = setInterval(() => syncHistory(result.client, tag), 30000);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -183,6 +190,7 @@ const result = await autoConnect({
   };
 
   const disconnect = async () => {
+    if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
     try {
       if (clientRef.current) {
         await clientRef.current.disconnect();

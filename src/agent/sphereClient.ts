@@ -42,18 +42,11 @@ export async function getSphereClient(): Promise<Sphere> {
       deviceId: "trust-score-agent-v1",
     });
 
-    const { sphere, created, generatedMnemonic } = await Sphere.init({
+    const { sphere } = await Sphere.init({
       ...providers,
       network: "testnet2",
-      autoGenerate: true,
+      mnemonic: process.env.SPHERE_AGENT_MNEMONIC,
     });
-
-    if (created && generatedMnemonic) {
-      console.log(
-        "[Agent] NEW WALLET CREATED - save this mnemonic:",
-        generatedMnemonic
-      );
-    }
 
     console.log(
       "[Agent] Sphere client initialized. Address:",
