@@ -16,20 +16,22 @@ export interface WalletScore {
   total: number;
 }
 
-async function computeScore(wallet: string, completed: number): Promise<number> {
+async function computeScore(completed: number): Promise<number> {
   if (completed === 0) return 0;
 
-  // Find the current highest trade count across ALL wallets
+  // Count completed trades per wallet, counting BOTH sides (wallet_a or wallet_b)
   const maxResult = await db.execute(sql`
     SELECT MAX(cnt) as max_completed FROM (
-      SELECT COUNT(*) as cnt FROM trade_event
-      WHERE outcome = 'completed'
-      GROUP BY wallet_a
-    ) sub
+      SELECT wallet, COUNT(*) as cnt FROM (
+        SELECT wallet_a as wallet FROM trade_event WHERE outcome = 'completed'
+        UNION ALL
+        SELECT wallet_b as wallet FROM trade_event WHERE outcome = 'completed' AND wallet_b IS NOT NULL
+      ) sub
+      GROUP BY wallet
+    ) counts
   `);
   const maxCompleted = Number((maxResult.rows[0] as { max_completed: string })?.max_completed || completed);
 
-  // Relative score: top wallet = 100, others scaled proportionally
   return Math.round((completed / Math.max(maxCompleted, 1)) * 100);
 }
 
@@ -51,7 +53,7 @@ export async function recalculateScore(
   const completed = events.filter((e) => e.outcome === "completed").length;
   const abandoned = 0; // not measurable from wallet history
   const total = completed;
-  const score = await computeScore(wallet, completed);
+ const score = await computeScore(completed);
 
   // Write new score to history
   await db.insert(scoreHistory).values({
@@ -74,9 +76,9 @@ export async function getLatestScore(wallet: string): Promise<WalletScore> {
     );
 
   const completed = events.filter((e) => e.outcome === "completed").length;
-  const abandoned = events.filter((e) => e.outcome === "abandoned").length;
-  const total = completed + abandoned;
-  const score = total === 0 ? 0 : Math.round((completed / total) * 100);
+  const abandoned = 0;
+  const total = completed;
+  const score = await computeScore(completed);
 
   return { wallet, score, completed, abandoned, total };
 }
