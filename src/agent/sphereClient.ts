@@ -11,8 +11,9 @@ import fs from "fs";
 
 const TESTNET2_API_KEY = "sk_ddc3cfcc001e4a28ac3fad7407f99590";
 const WALLET_API_URL = "https://wallet-api.unicity.network";
-const DATA_DIR = path.join(process.cwd(), ".sphere-agent", "wallet-data");
-const TOKENS_DIR = path.join(process.cwd(), ".sphere-agent", "tokens-data");
+const BASE_DIR = process.env.VERCEL ? "/tmp/.sphere-agent" : path.join(process.cwd(), ".sphere-agent");
+const DATA_DIR = path.join(BASE_DIR, "wallet-data");
+const TOKENS_DIR = path.join(BASE_DIR, "tokens-data");
 
 let sphereInstance: Sphere | null = null;
 let initPromise: Promise<Sphere> | null = null;
