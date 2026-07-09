@@ -15,8 +15,10 @@ export async function POST(req: NextRequest) {
         ? e.recipientNametag ? "@" + e.recipientNametag : null
         : e.senderNametag ? "@" + e.senderNametag : null;
 
+    if (!txId) continue;
+    const outcome = e.status === "failed" || !counterparty ? "abandoned" : "completed";
     await db.insert(tradeEvent).values({
-      txId, walletA: tag, walletB: counterparty, outcome: "completed",
+      txId, walletA: tag, walletB: counterparty, outcome,
     }).onConflictDoNothing();
   }
 
