@@ -38,12 +38,15 @@ export default function ConnectPage() {
       let cursor: string | undefined = undefined;
       let page: any;
 
-      do {
+    do {
         page = await client.query("sphere_getHistory", { limit: 200, cursor });
+        console.log("RAW PAGE:", page);
         const items = Array.isArray(page) ? page : page.items || page.history || [];
         allHistory = allHistory.concat(items);
         cursor = page?.nextCursor || page?.cursor;
       } while (cursor && allHistory.length < 2000);
+
+      console.log("FINAL LENGTH:", allHistory.length);
 
       await fetch("/api/wallet/backfill", {
         method: "POST",
