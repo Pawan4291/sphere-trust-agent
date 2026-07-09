@@ -123,6 +123,17 @@ const result = await autoConnect({
             directAddress: id.directAddress,
           }),
         });
+
+        // Pull this wallet's REAL past history (granted via HISTORY_READ) and backfill it
+        const history = await result.client.query("sphere_getHistory");
+        await fetch("/api/wallet/backfill", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            nametag: id.nametag || id.directAddress || "unknown",
+            history,
+          }),
+        });
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
