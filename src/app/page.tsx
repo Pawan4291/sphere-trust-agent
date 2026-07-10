@@ -235,9 +235,8 @@ const result = await autoConnect({
     }, 500);
   };
 
- const disconnect = async () => {
+  const disconnect = async () => {
     if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
-    syncIntervalRef.current = null;
     try {
       if (clientRef.current) {
         await clientRef.current.disconnect();
@@ -245,10 +244,10 @@ const result = await autoConnect({
     } catch (err) {
       console.error("Error disconnecting:", err);
     }
+    setIdentity(null);
+    setConnState("idle");
     localStorage.removeItem(sessionKey);
-    // Full reload guarantees any stale timers/closures from this session are gone,
-    // since we can't be sure the host page fully unmounts this component.
-    window.location.href = "/";
+    clientRef.current = null;
   };
 
   const stats = [

@@ -19,8 +19,9 @@ export async function POST(req: NextRequest) {
 
     if (!txId) continue;
     const outcome = e.status === "failed" || !counterparty ? "abandoned" : "completed";
-    await db.insert(tradeEvent).values({
+   await db.insert(tradeEvent).values({
       txId, walletA: tag, walletB: counterparty, outcome,
+      detectedAt: e.timestamp ? new Date(e.timestamp) : new Date(),
     }).onConflictDoNothing();
   }
 

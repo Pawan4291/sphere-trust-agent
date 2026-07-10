@@ -17,13 +17,14 @@ export async function POST(req: NextRequest) {
 
     if (!txId) continue;
     const outcome = e.status === "failed" || !counterparty ? "abandoned" : "completed";
-    await db
+   await db
       .insert(tradeEvent)
       .values({
         txId,
         walletA: cleanTag,
         walletB: counterparty,
         outcome,
+        detectedAt: e.timestamp ? new Date(e.timestamp) : new Date(),
       })
       .onConflictDoNothing();
   }
