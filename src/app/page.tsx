@@ -46,6 +46,7 @@ export default function ConnectPage() {
       } while (cursor && allHistory.length < 2000);
 
       console.log("FINAL LENGTH:", allHistory.length);
+      console.log("UNIQUE IDS:", new Set(allHistory.map((e: any) => e.id)).size);
 
       await fetch("/api/wallet/backfill", {
         method: "POST",
