@@ -11,12 +11,14 @@ export async function GET(
   const { nametag } = await params;
   const cleanTag = nametag.replace(/^@/, "").toLowerCase();
 
-  // Register this wallet for watching (so the agent picks it up)
-  try {
-    await addWatchedWallet(cleanTag);
-  } catch {
-    // ignore duplicates
-  }
+  // Check if this wallet has ever actually connected (granted us permission)
+  const known = await db
+    .select()
+    .from(watchedWallets)
+    .where(sql`${watchedWallets.nametag} = ${cleanTag}`)
+    .limit(1);
+
+  const hasConnected = known.length > 0;
 
   // Get trade events for this wallet
   const allEvents = await db
@@ -54,6 +56,7 @@ export async function GET(
     completed,
     abandoned,
     total,
+    hasConnected,
     latestTxId: latestTx,
     explorerUrl: null, // no confirmed public per-transfer explorer exists for testnet2 token transfers
     scoreHistory: history.map((h) => ({

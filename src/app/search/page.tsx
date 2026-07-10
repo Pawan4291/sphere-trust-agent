@@ -171,11 +171,17 @@ export default function SearchPage() {
                       @{result.nametag}
                     </h2>
 
-                    {result.total === 0 ? (
+                    {!(result as any).hasConnected ? (
                       <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
                         <p className="text-gray-500 font-mono text-sm">
-                          No trade events recorded yet. This wallet is now being
-                          watched by the agent.
+                          This wallet has never connected to Trust Score Agent —
+                          we have no on-chain history to score.
+                        </p>
+                      </div>
+                    ) : result.total === 0 ? (
+                      <div className="bg-black/40 rounded-xl p-4 border border-gray-800">
+                        <p className="text-gray-500 font-mono text-sm">
+                          Connected, but no trade events recorded yet.
                         </p>
                         <p className="text-orange-500/60 text-xs font-mono mt-2">
                           Scores appear after real on-chain activity is detected.
