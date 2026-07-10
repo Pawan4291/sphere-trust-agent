@@ -209,14 +209,14 @@ export default function MyScorePage() {
             <div className="glass-card p-8 glow-border">
               <div className="flex flex-col lg:flex-row items-center gap-10">
                 {/* Score ring */}
-                <div className="relative flex-shrink-0">
-                  <ScoreRing score={scoreData.score} size={200} />
+                <div className="relative flex-shrink-0 mb-6">
+                  <ScoreRing score={scoreData.score} size={170} />
                   {/* Badge */}
                   <motion.div
                     initial={{ opacity: 0, scale: 0 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 1.2 }}
-                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold"
+                   className="absolute -bottom-8 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap"
                     style={{
                       background:
                         badge.color === "green"
@@ -317,16 +317,7 @@ export default function MyScorePage() {
                         <code className="text-orange-400 text-xs font-mono flex-1 truncate">
                           {scoreData.latestTxId}
                         </code>
-                        {scoreData.explorerUrl && (
-                          <a
-                            href={scoreData.explorerUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2 py-1 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 text-xs rounded border border-orange-500/30 transition-colors whitespace-nowrap"
-                          >
-                            Verify ↗
-                          </a>
-                        )}
+                       
                       </div>
                     </div>
                   )}
@@ -412,8 +403,13 @@ export default function MyScorePage() {
                         {ev.outcome === "completed" ? "✓" : "✗"}{" "}
                         {ev.outcome.toUpperCase()}
                       </span>
-                      <div className="flex-1 min-w-0">
-                        <code className="text-gray-500 text-xs font-mono truncate block">
+                     <div className="flex-1 min-w-0">
+                        <p className="text-gray-300 text-xs font-mono truncate">
+                          with {ev.walletA === identity?.nametag || ev.walletA === identity?.directAddress
+                            ? ev.walletB || "unknown"
+                            : ev.walletA}
+                        </p>
+                        <code className="text-gray-600 text-[10px] font-mono truncate block">
                           {ev.txId}
                         </code>
                       </div>

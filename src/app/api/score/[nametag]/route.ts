@@ -55,9 +55,7 @@ export async function GET(
     abandoned,
     total,
     latestTxId: latestTx,
-    explorerUrl: latestTx
-      ? `https://explorer.testnet2.unicity.network/tx/${latestTx}`
-      : null,
+    explorerUrl: null, // no confirmed public per-transfer explorer exists for testnet2 token transfers
     scoreHistory: history.map((h) => ({
       score: parseFloat(h.score),
       recordedAt: h.recordedAt,
