@@ -48,18 +48,14 @@ export default function MyScorePage() {
   const [scoreData, setScoreData] = useState<ScoreData | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+ useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
     if (saved) {
       try {
         const parsed: Identity = JSON.parse(saved);
         setIdentity(parsed);
         const tag = parsed.nametag || parsed.directAddress || "";
-        if (tag) {
-          loadScore(tag);
-          const interval = setInterval(() => loadScore(tag), 10000);
-          return () => clearInterval(interval);
-        }
+        if (tag) loadScore(tag);
       } catch {}
     }
   }, []);
@@ -133,9 +129,21 @@ export default function MyScorePage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-orange-400 text-2xl font-mono">◎</span>
-            <h1 className="text-3xl font-black gradient-text">My Score</h1>
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="flex items-center gap-3">
+              <span className="text-orange-400 text-2xl font-mono">◎</span>
+              <h1 className="text-3xl font-black gradient-text">My Score</h1>
+            </div>
+            <button
+              onClick={() => {
+                const tag = identity?.nametag || identity?.directAddress || "";
+                if (tag) loadScore(tag);
+              }}
+              disabled={loading}
+              className="px-4 py-2 border border-gray-700 hover:border-orange-500 text-gray-400 hover:text-orange-400 text-xs font-mono rounded-lg transition-colors disabled:opacity-50"
+            >
+              {loading ? "Refreshing…" : "↻ Refresh"}
+            </button>
           </div>
           <p className="text-gray-500 font-mono text-sm">
             Your real-time trust score computed from on-chain trade history
