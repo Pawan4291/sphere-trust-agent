@@ -48,14 +48,25 @@ export default function MyScorePage() {
   const [scoreData, setScoreData] = useState<ScoreData | null>(null);
   const [loading, setLoading] = useState(false);
 
- useEffect(() => {
+const [syncing, setSyncing] = useState(false);
+
+  useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
     if (saved) {
       try {
         const parsed: Identity = JSON.parse(saved);
         setIdentity(parsed);
         const tag = parsed.nametag || parsed.directAddress || "";
-        if (tag) loadScore(tag);
+        if (tag) {
+          setSyncing(true);
+          // Give the background history sync time to finish writing
+          // real trade data before showing the score, so numbers are
+          // accurate on first load instead of a race-condition undercount.
+          setTimeout(() => {
+            loadScore(tag);
+            setSyncing(false);
+          }, 4000);
+        }
       } catch {}
     }
   }, []);
@@ -182,8 +193,24 @@ export default function MyScorePage() {
           )}
         </AnimatePresence>
 
+        {/* Connected — syncing (waiting for real history to finish writing) */}
+        {identity && syncing && (
+          <div className="glass-card p-12 text-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+              className="text-5xl text-orange-500 mb-4"
+            >
+              ◎
+            </motion.div>
+            <p className="text-gray-400 font-mono text-sm">
+              Syncing your on-chain trade history…
+            </p>
+          </div>
+        )}
+
         {/* Connected — loading */}
-        {identity && loading && (
+        {identity && !syncing && loading && (
           <div className="glass-card p-12 text-center">
             <motion.div
               animate={{ rotate: 360 }}
@@ -199,7 +226,7 @@ export default function MyScorePage() {
         )}
 
         {/* Connected — data */}
-        {identity && !loading && scoreData && (
+        {identity && !syncing && !loading && scoreData && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
