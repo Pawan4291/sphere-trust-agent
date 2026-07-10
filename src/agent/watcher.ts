@@ -32,9 +32,11 @@ async function processTransfer(
     // under two different real ids.
     const recentDupe = await db.execute(sql`
       SELECT id FROM trade_event
-      WHERE wallet_a = ${walletA}
-        AND (wallet_b = ${walletB} OR (${walletB}::text IS NULL AND wallet_b IS NULL))
-        AND detected_at > now() - interval '2 minutes'
+      WHERE (
+        (wallet_a = ${walletA} AND wallet_b = ${walletB})
+        OR (wallet_a = ${walletB} AND wallet_b = ${walletA})
+      )
+      AND detected_at > now() - interval '5 minutes'
       LIMIT 1
     `);
     if (recentDupe.rows.length > 0) {
