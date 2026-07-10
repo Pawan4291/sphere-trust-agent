@@ -54,8 +54,11 @@ export default function MyScorePage() {
       try {
         const parsed: Identity = JSON.parse(saved);
         setIdentity(parsed);
-        if (parsed.nametag || parsed.directAddress) {
-          loadScore(parsed.nametag || parsed.directAddress || "");
+        const tag = parsed.nametag || parsed.directAddress || "";
+        if (tag) {
+          loadScore(tag);
+          const interval = setInterval(() => loadScore(tag), 10000);
+          return () => clearInterval(interval);
         }
       } catch {}
     }

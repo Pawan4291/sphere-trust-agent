@@ -92,16 +92,42 @@ export default function ConnectPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Try to restore session from localStorage
+  // Restore session from localStorage — silently re-attach a live client and resume syncing
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
-    if (saved) {
+    if (!saved) return;
+
+    (async () => {
       try {
         const parsed = JSON.parse(saved);
         setIdentity(parsed);
         setConnState("connected");
-      } catch {}
-    }
+
+        const { autoConnect } = await import("@unicitylabs/sphere-sdk/connect/browser");
+        const { SPHERE_NETWORKS, PERMISSION_SCOPES } = await import("@unicitylabs/sphere-sdk/connect");
+
+        const result = await autoConnect({
+          dapp: { name: "Unicity Trust Score Agent", url: location.origin },
+          walletUrl: SPHERE_WALLET_URL,
+          network: SPHERE_NETWORKS.testnet2,
+          silent: true,
+          permissions: [
+            PERMISSION_SCOPES.HISTORY_READ,
+            PERMISSION_SCOPES.EVENTS_SUBSCRIBE,
+            PERMISSION_SCOPES.RESOLVE_PEER,
+          ],
+        });
+
+        clientRef.current = result.client;
+        const tag = parsed.nametag || parsed.directAddress || "unknown";
+        await syncHistory(result.client, tag);
+        syncIntervalRef.current = setInterval(() => {
+          if (clientRef.current) syncHistory(clientRef.current, tag);
+        }, 30000);
+      } catch (err) {
+        console.error("Silent reconnect failed:", err);
+      }
+    })();
   }, []);
 
   const connectWithSpherePopup = async () => {
