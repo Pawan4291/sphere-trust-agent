@@ -82,7 +82,7 @@ async function processTransfer(
   }
 }
 
-async function pollWatchedWallets(): Promise<void> {
+export async function pollWatchedWallets(): Promise<void> {
   try {
     // Drain the agent's own mailbox for any incoming transfers
     const sphere = await getSphereClient();
