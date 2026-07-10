@@ -29,10 +29,13 @@ export async function GET(
 
   const events = allEvents.slice(0, 50);
 
-  const completed = allEvents.filter((e) => e.outcome === "completed").length;
+ const completed = allEvents.filter((e) => e.outcome === "completed").length;
   const abandoned = allEvents.filter((e) => e.outcome === "abandoned").length;
   const total = completed + abandoned;
-  const score = total === 0 ? null : Math.round((completed / total) * 100);
+
+  const { getLatestScore } = await import("@/agent/scorer");
+  const latest = await getLatestScore("@" + cleanTag);
+  const score = total === 0 ? null : latest.score;
 
   // Get score history
   const history = await db
