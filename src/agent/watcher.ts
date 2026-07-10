@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { tradeEvent, watchedWallets } from "@/db/schema";
+import { sql } from "drizzle-orm";
 import { recalculateScore } from "./scorer";
 import { logActivity } from "./activityLogger";
 import { getSphereClient } from "./sphereClient";
@@ -25,6 +26,22 @@ async function processTransfer(
   processedTxIds.add(txId);
 
   try {
+    // Content-based dedup: skip if a trade between these same wallets was
+    // already recorded within the last 2 minutes, since the mailbox drain
+    // (QStash) and history sync (frontend) can report the same real trade
+    // under two different real ids.
+    const recentDupe = await db.execute(sql`
+      SELECT id FROM trade_event
+      WHERE wallet_a = ${walletA}
+        AND (wallet_b = ${walletB} OR (${walletB}::text IS NULL AND wallet_b IS NULL))
+        AND detected_at > now() - interval '2 minutes'
+      LIMIT 1
+    `);
+    if (recentDupe.rows.length > 0) {
+      console.log(`[Agent] Skipped likely duplicate: ${walletA} <-> ${walletB}`);
+      return;
+    }
+
     await db.insert(tradeEvent).values({ txId, walletA, walletB, outcome }).onConflictDoNothing();
     await recalculateScore(walletA, txId);
     if (walletB) await recalculateScore(walletB, txId);
