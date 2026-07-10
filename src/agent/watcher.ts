@@ -85,9 +85,13 @@ export async function pollWatchedWallets(): Promise<void> {
           .map((t: { amount: string; symbol: string }) => `${t.amount} ${t.symbol}`)
           .join(", ");
 
-        await processTransfer(
-          txId, senderLabel, agentAddress, "completed",
-          `Received transfer from ${senderLabel}: ${tokenSummary || "tokens"} [tx: ${txId}]`
+        // This is the agent's OWN wallet mailbox — not the connected user's
+        // wallet. Recording it into trade_event double-counts trades already
+        // captured correctly by sphere_getHistory sync from the user's side.
+        // Log only, for visibility in Agent Activity.
+        await logActivity(
+          `Agent wallet received transfer from ${senderLabel}: ${tokenSummary || "tokens"} [tx: ${txId}]`,
+          txId
         );
       });
 
