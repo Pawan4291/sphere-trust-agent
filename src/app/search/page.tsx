@@ -189,17 +189,12 @@ export default function SearchPage() {
                       </div>
                     ) : (
                       <>
-                        <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="grid grid-cols-2 gap-3 mb-4">
                           {[
                             {
                               label: "Completed",
                               value: result.completed,
                               color: "text-green-400",
-                            },
-                            {
-                              label: "Abandoned",
-                              value: result.abandoned,
-                              color: "text-red-400",
                             },
                             {
                               label: "Total",
@@ -225,23 +220,14 @@ export default function SearchPage() {
 
                         {result.latestTxId && (
                           <div className="bg-black/50 rounded-xl p-3 border border-orange-500/20">
-                            <p className="text-gray-500 text-[10px] font-mono mb-1">
-                              MOST RECENT TX (verify on-chain)
+                           <p className="text-gray-500 text-[10px] font-mono mb-1">
+                              MOST RECENT TX ID
                             </p>
                             <div className="flex items-center gap-2">
                               <code className="text-orange-400 text-xs font-mono break-all flex-1">
                                 {result.latestTxId.slice(0, 48)}…
                               </code>
-                              {result.explorerUrl && (
-                                <a
-                                  href={result.explorerUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-2 py-1 bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 text-xs rounded border border-orange-500/30 transition-colors whitespace-nowrap"
-                                >
-                                  Verify ↗
-                                </a>
-                              )}
+                             
                             </div>
                           </div>
                         )}
