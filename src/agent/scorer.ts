@@ -32,7 +32,7 @@ async function computeScore(completed: number): Promise<number> {
   `);
   const maxCompleted = Number((maxResult.rows[0] as { max_completed: string })?.max_completed || completed);
 
-  return Math.round((completed / Math.max(maxCompleted, 1)) * 100);
+  return Math.round((completed / Math.max(maxCompleted, 1)) * 96);
 }
 
 export async function recalculateScore(
