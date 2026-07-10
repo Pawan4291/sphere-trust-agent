@@ -311,7 +311,7 @@ export default function MyScorePage() {
                   {scoreData.latestTxId && (
                     <div className="mt-4 bg-black/50 rounded-xl p-3 border border-orange-500/20">
                       <p className="text-gray-600 text-[10px] font-mono mb-1">
-                        LATEST VERIFIED TX
+                        LATEST TX ID
                       </p>
                       <div className="flex items-center gap-2">
                         <code className="text-orange-400 text-xs font-mono flex-1 truncate">
@@ -405,9 +405,12 @@ export default function MyScorePage() {
                       </span>
                      <div className="flex-1 min-w-0">
                         <p className="text-gray-300 text-xs font-mono truncate">
-                          with {ev.walletA === identity?.nametag || ev.walletA === identity?.directAddress
-                            ? ev.walletB || "unknown"
-                            : ev.walletA}
+                          with {
+                            (ev.walletA?.replace(/^@/, "") === identity?.nametag ||
+                             ev.walletA === identity?.directAddress)
+                              ? (ev.walletB || "unknown")
+                              : ev.walletA
+                          }
                         </p>
                         <code className="text-gray-600 text-[10px] font-mono truncate block">
                           {ev.txId}
