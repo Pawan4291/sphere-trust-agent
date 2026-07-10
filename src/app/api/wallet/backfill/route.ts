@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
   const { nametag, history } = await req.json();
   const tag = "@" + String(nametag).replace(/^@/, "").toLowerCase();
 
+  console.log("SAMPLE HISTORY ITEM:", JSON.stringify(history?.[0], null, 2));
+
   for (const e of history || []) {
     if (e.type !== "SENT" && e.type !== "RECEIVED") continue;
     const txId = e.transferId || e.id;
