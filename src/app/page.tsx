@@ -320,6 +320,17 @@ const result = await autoConnect({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
           >
+            {/* Use case line */}
+          <motion.p
+            className="text-gray-500 text-sm md:text-base mb-10 max-w-xl mx-auto"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+          >
+            Connect your wallet, see your real trade history turned into a
+            trust score, and compare yourself against every other trader on
+            testnet2 — live, no self-reporting, no manual review.
+          </motion.p>
             {stats.map((s, i) => (
               <motion.div
                 key={s.label}
