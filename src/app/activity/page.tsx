@@ -206,11 +206,11 @@ export default function ActivityPage() {
                 PROOF OF NO FAKE DATA
               </p>
               <p className="text-gray-400 text-sm">
-                Every row below was written by the backend agent after processing
-                a real Sphere testnet2 SDK event. The agent polls every 15
-                seconds via <code className="text-orange-400">sphere.payments.receive()</code>{" "}
-                and listens to <code className="text-orange-400">transfer:incoming</code> events.
-                No row is ever inserted from the frontend.
+                Trust scores are computed from real on-chain trade history
+                fetched directly from each wallet via the Sphere SDK when a
+                user connects. This feed separately logs the agent&apos;s own
+                background wallet activity — it may be empty if the agent
+                wallet itself hasn&apos;t received a transfer recently.
               </p>
             </div>
           </div>

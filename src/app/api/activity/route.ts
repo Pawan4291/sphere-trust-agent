@@ -10,9 +10,7 @@ export async function GET() {
         text: a.text,
         txId: a.txId,
         createdAt: a.createdAt,
-        explorerUrl: a.txId
-          ? `https://explorer.testnet2.unicity.network/tx/${a.txId}`
-          : null,
+       explorerUrl: null, // no confirmed public explorer for testnet2 transfers
       })),
     });
   } catch (err) {

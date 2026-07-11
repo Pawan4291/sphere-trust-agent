@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
+import { logActivity } from "@/agent/activityLogger";
 import { tradeEvent } from "@/db/schema";
 import { recalculateScore } from "@/agent/scorer";
 
@@ -29,8 +30,12 @@ export async function POST(req: NextRequest) {
     }).onConflictDoNothing();
   }
 
-  if (history?.length) {
+if (history?.length) {
     await recalculateScore(tag, history[0].transferId || history[0].id || "sync");
+    await logActivity(
+      `${tag} synced ${history.length} real trade${history.length === 1 ? "" : "s"} from testnet2`,
+      history[0].transferId || history[0].id || null
+    );
   }
   return NextResponse.json({ synced: history?.length || 0 });
 }
