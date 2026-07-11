@@ -19,8 +19,6 @@ export interface WalletScore {
 async function computeScore(completed: number): Promise<number> {
   if (completed === 0) return 0;
 
-  // Relative scoring: the wallet with the most completed trades gets 100,
-  // everyone else is scaled proportionally against that top performer.
   const maxResult = await db.execute(sql`
     SELECT MAX(cnt) as max_completed FROM (
       SELECT wallet_a as wallet, COUNT(*) as cnt
@@ -31,7 +29,7 @@ async function computeScore(completed: number): Promise<number> {
   `);
   const maxCompleted = Number((maxResult.rows[0] as { max_completed: string })?.max_completed || completed);
 
-  return Math.round((completed / Math.max(maxCompleted, 1)) * 100);
+  return Math.round((completed / Math.max(maxCompleted, 1)) * 96);
 }
 
 export async function recalculateScore(
