@@ -140,7 +140,7 @@ export default function LeaderboardPage() {
                     {entry.wallet.replace(/^@/, "").slice(0, 12)}
                   </p>
                   <p className="text-gray-600 text-[10px] font-mono">
-                    {entry.completed}W / {entry.abandoned}L
+                    {entry.completed} trades
                   </p>
                 </motion.div>
               );
@@ -164,13 +164,10 @@ export default function LeaderboardPage() {
             <div className="col-span-2 text-gray-600 text-xs font-mono text-center">
               SCORE
             </div>
-            <div className="col-span-2 text-gray-600 text-xs font-mono text-center">
+           <div className="col-span-3 text-gray-600 text-xs font-mono text-center">
               COMPLETED
             </div>
-            <div className="col-span-2 text-gray-600 text-xs font-mono text-center">
-              ABANDONED
-            </div>
-            <div className="col-span-1 text-gray-600 text-xs font-mono text-right">
+            <div className="col-span-2 text-gray-600 text-xs font-mono text-right">
               TX
             </div>
           </div>
@@ -262,31 +259,21 @@ export default function LeaderboardPage() {
                   </div>
 
                   {/* Completed */}
-                  <div className="col-span-2 flex items-center justify-center">
+                  <div className="col-span-3 flex items-center justify-center">
                     <span className="text-green-400 font-mono text-sm font-bold">
                       {entry.completed}
                     </span>
                   </div>
 
-                  {/* Abandoned */}
-                  <div className="col-span-2 flex items-center justify-center">
-                    <span className="text-red-400 font-mono text-sm">
-                      {entry.abandoned}
-                    </span>
-                  </div>
-
                   {/* TX Link */}
-                  <div className="col-span-1 flex items-center justify-end">
-                    {entry.reasonTxId ? (
-                      <a
-                        href={`https://explorer.testnet2.unicity.network/tx/${entry.reasonTxId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-500/50 hover:text-orange-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  <div className="col-span-2 flex items-center justify-end">
+                   {entry.reasonTxId ? (
+                      <span
+                        className="text-orange-500/50 text-xs font-mono truncate"
                         title={entry.reasonTxId}
                       >
-                        ↗
-                      </a>
+                        {entry.reasonTxId.slice(0, 6)}…
+                      </span>
                     ) : (
                       <span className="text-gray-800 text-xs">—</span>
                     )}
