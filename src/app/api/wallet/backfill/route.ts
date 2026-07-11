@@ -21,18 +21,7 @@ export async function POST(req: NextRequest) {
    if (!txId) continue;
     const outcome = e.status === "failed" || !counterparty ? "abandoned" : "completed";
 
-    // Skip if the reverse-perspective of this same real trade was already
-    // recorded (e.g. by the counterparty's own sync) — same trade, two
-    // different real ids from each side's history.
-    if (counterparty) {
-      const existing = await db.execute(sql`
-        SELECT id FROM trade_event
-        WHERE (wallet_a = ${tag} AND wallet_b = ${counterparty})
-           OR (wallet_a = ${counterparty} AND wallet_b = ${tag})
-        LIMIT 1
-      `);
-      if (existing.rows.length > 0) continue;
-    }
+   
 
     await db.insert(tradeEvent).values({
       txId, walletA: tag, walletB: counterparty, outcome,

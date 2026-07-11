@@ -17,22 +17,8 @@ export interface WalletScore {
 }
 
 async function computeScore(completed: number): Promise<number> {
-  if (completed === 0) return 0;
-
-  // Count completed trades per wallet, counting BOTH sides (wallet_a or wallet_b)
-  const maxResult = await db.execute(sql`
-    SELECT MAX(cnt) as max_completed FROM (
-      SELECT wallet, COUNT(*) as cnt FROM (
-        SELECT wallet_a as wallet FROM trade_event WHERE outcome = 'completed'
-        UNION ALL
-        SELECT wallet_b as wallet FROM trade_event WHERE outcome = 'completed' AND wallet_b IS NOT NULL
-      ) sub
-      GROUP BY wallet
-    ) counts
-  `);
-  const maxCompleted = Number((maxResult.rows[0] as { max_completed: string })?.max_completed || completed);
-
-  return Math.round((completed / Math.max(maxCompleted, 1)) * 96);
+  // Score reflects real completed trade count directly, capped at 100.
+  return Math.min(100, completed);
 }
 
 export async function recalculateScore(
@@ -95,11 +81,11 @@ export async function getLeaderboard(limit = 50) {
   const leaderboard = await Promise.all(
     (rows.rows as Array<{ wallet: string; score: string; recorded_at: Date; reason_tx_id: string }>).map(async (row) => {
       const counts = await db.execute(sql`
-        SELECT
+       SELECT
           COUNT(*) FILTER (WHERE outcome = 'completed') as completed,
           COUNT(*) FILTER (WHERE outcome = 'abandoned') as abandoned
         FROM trade_event
-        WHERE wallet_a = ${row.wallet} OR wallet_b = ${row.wallet}
+        WHERE wallet_a = ${row.wallet}
       `);
       const c = counts.rows[0] as { completed: string; abandoned: string };
       return {
