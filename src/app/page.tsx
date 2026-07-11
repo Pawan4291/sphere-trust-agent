@@ -469,7 +469,7 @@ const result = await autoConnect({
                       step: "01",
                       text: "Agent watches real Sphere testnet2 transfers every 15s",
                     },
-                    {
+                   {
                       step: "02",
                       text: "Classifies each event: completed trade or abandoned intent",
                     },
