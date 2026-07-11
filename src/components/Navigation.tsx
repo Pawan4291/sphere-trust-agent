@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -33,13 +34,13 @@ export default function Navigation() {
         }}
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+       <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-9 h-9">
-            <div className="w-9 h-9 rounded-lg bg-orange-500 flex items-center justify-center text-black font-black text-sm glow-orange group-hover:scale-110 transition-transform">
-              TS
+            <div className="w-9 h-9 rounded-full overflow-hidden group-hover:scale-110 transition-transform">
+              <Image src="/icon.png" alt="Trust Score Agent" width={36} height={36} className="w-full h-full object-cover" />
             </div>
             <motion.div
-              className="absolute inset-0 rounded-lg bg-orange-500 opacity-30"
+              className="absolute inset-0 rounded-full bg-orange-500 opacity-30 pointer-events-none"
               animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
               transition={{ duration: 2, repeat: Infinity }}
             />
