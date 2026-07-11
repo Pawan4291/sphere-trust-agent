@@ -17,8 +17,21 @@ export interface WalletScore {
 }
 
 async function computeScore(completed: number): Promise<number> {
-  // Score reflects real completed trade count directly, capped at 100.
-  return Math.min(100, completed);
+  if (completed === 0) return 0;
+
+  // Relative scoring: the wallet with the most completed trades gets 100,
+  // everyone else is scaled proportionally against that top performer.
+  const maxResult = await db.execute(sql`
+    SELECT MAX(cnt) as max_completed FROM (
+      SELECT wallet_a as wallet, COUNT(*) as cnt
+      FROM trade_event
+      WHERE outcome = 'completed'
+      GROUP BY wallet_a
+    ) counts
+  `);
+  const maxCompleted = Number((maxResult.rows[0] as { max_completed: string })?.max_completed || completed);
+
+  return Math.round((completed / Math.max(maxCompleted, 1)) * 100);
 }
 
 export async function recalculateScore(
