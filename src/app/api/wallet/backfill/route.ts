@@ -32,10 +32,20 @@ export async function POST(req: NextRequest) {
 
 if (history?.length) {
     await recalculateScore(tag, history[0].transferId || history[0].id || "sync");
-    await logActivity(
-      `${tag} synced ${history.length} real trade${history.length === 1 ? "" : "s"} from testnet2`,
-      history[0].transferId || history[0].id || null
-    );
+
+    // Avoid duplicate-looking log spam when two syncs land close together
+    const recentLog = await db.execute(sql`
+      SELECT id FROM activity_log
+      WHERE text = ${`${tag} synced ${history.length} real trade${history.length === 1 ? "" : "s"} from testnet2`}
+      AND created_at > now() - interval '20 seconds'
+      LIMIT 1
+    `);
+    if (recentLog.rows.length === 0) {
+      await logActivity(
+        `${tag} synced ${history.length} real trade${history.length === 1 ? "" : "s"} from testnet2`,
+        history[0].transferId || history[0].id || null
+      );
+    }
   }
   return NextResponse.json({ synced: history?.length || 0 });
 }
