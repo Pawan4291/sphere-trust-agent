@@ -35,15 +35,14 @@ export default function Navigation() {
       >
         {/* Logo */}
        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative w-9 h-9">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-black border border-orange-500/30 group-hover:scale-110 transition-transform">
-              <Image src="/icon.png" alt="Trust Score Agent" width={40} height={40} className="w-full h-full object-cover" />
-            </div>
+          <div className="relative w-10 h-10">
             <motion.div
-              className="absolute inset-0 rounded-full bg-orange-500 opacity-30 pointer-events-none"
-              animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
+              className="w-10 h-10 rounded-full overflow-hidden bg-black border border-orange-500/30 group-hover:scale-110 transition-transform"
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity }}
+            >
+              <Image src="/icon.png" alt="Trust Score Agent" width={40} height={40} className="w-full h-full object-cover" />
+            </motion.div>
           </div>
           <div>
             <p className="text-white font-bold text-sm leading-none">
