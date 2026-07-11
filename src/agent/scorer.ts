@@ -46,9 +46,7 @@ export async function recalculateScore(
       detectedAt: tradeEvent.detectedAt,
     })
     .from(tradeEvent)
-    .where(
-      sql`${tradeEvent.walletA} = ${wallet} OR ${tradeEvent.walletB} = ${wallet}`
-    );
+    .where(sql`${tradeEvent.walletA} = ${wallet}`);
 
   const completed = events.filter((e) => e.outcome === "completed").length;
   const abandoned = 0; // not measurable from wallet history
@@ -71,9 +69,7 @@ export async function getLatestScore(wallet: string): Promise<WalletScore> {
       outcome: tradeEvent.outcome,
     })
     .from(tradeEvent)
-    .where(
-      sql`${tradeEvent.walletA} = ${wallet} OR ${tradeEvent.walletB} = ${wallet}`
-    );
+   .where(sql`${tradeEvent.walletA} = ${wallet}`);
 
   const completed = events.filter((e) => e.outcome === "completed").length;
   const abandoned = 0;

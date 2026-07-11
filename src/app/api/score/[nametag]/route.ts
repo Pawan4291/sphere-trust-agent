@@ -21,12 +21,10 @@ export async function GET(
   const hasConnected = known.length > 0;
 
   // Get trade events for this wallet
-  const allEvents = await db
+ const allEvents = await db
     .select()
     .from(tradeEvent)
-    .where(
-      sql`${tradeEvent.walletA} = ${"@" + cleanTag} OR ${tradeEvent.walletB} = ${"@" + cleanTag}`
-    )
+    .where(sql`${tradeEvent.walletA} = ${"@" + cleanTag}`)
     .orderBy(desc(tradeEvent.detectedAt));
 
   const events = allEvents.slice(0, 50);
