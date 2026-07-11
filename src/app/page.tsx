@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import ParticleBackground from "@/components/ParticleBackground";
@@ -412,13 +412,13 @@ const result = await autoConnect({
                 className="max-w-md mx-auto"
               >
                 <div className="glass-card p-8 glow-border">
-                  <div className="flex justify-center mb-6">
+                 <div className="flex justify-center mb-6">
                     <motion.div
-                      className="w-20 h-20 rounded-full border-2 border-orange-500/40 flex items-center justify-center text-4xl"
+                      className="w-20 h-20 rounded-full border-2 border-orange-500/40 overflow-hidden bg-black"
                       animate={{ rotate: [0, 5, -5, 0] }}
                       transition={{ duration: 4, repeat: Infinity }}
                     >
-                      ⬡
+                      <Image src="/icon.png" alt="Trust Score Agent" width={80} height={80} className="w-full h-full object-cover" />
                     </motion.div>
                   </div>
 

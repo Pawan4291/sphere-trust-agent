@@ -36,8 +36,8 @@ export default function Navigation() {
         {/* Logo */}
        <Link href="/" className="flex items-center gap-3 group">
           <div className="relative w-9 h-9">
-            <div className="w-9 h-9 rounded-full overflow-hidden group-hover:scale-110 transition-transform">
-              <Image src="/icon.png" alt="Trust Score Agent" width={36} height={36} className="w-full h-full object-cover" />
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-black border border-orange-500/30 group-hover:scale-110 transition-transform">
+              <Image src="/icon.png" alt="Trust Score Agent" width={40} height={40} className="w-full h-full object-cover" />
             </div>
             <motion.div
               className="absolute inset-0 rounded-full bg-orange-500 opacity-30 pointer-events-none"
