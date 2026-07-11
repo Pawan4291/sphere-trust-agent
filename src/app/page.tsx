@@ -313,14 +313,7 @@ const result = await autoConnect({
             {typedText}
           </motion.p>
 
-          {/* Stats row */}
-          <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
-            {/* Use case line */}
+          {/* Use case line */}
           <motion.p
             className="text-gray-500 text-sm md:text-base mb-10 max-w-xl mx-auto"
             initial={{ opacity: 0, y: 10 }}
@@ -331,6 +324,14 @@ const result = await autoConnect({
             trust score, and compare yourself against every other trader on
             testnet2 — live, no self-reporting, no manual review.
           </motion.p>
+
+          {/* Stats row */}
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+          >
             {stats.map((s, i) => (
               <motion.div
                 key={s.label}
