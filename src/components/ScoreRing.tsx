@@ -77,24 +77,9 @@ export default function ScoreRing({
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          style={{ filter: `drop-shadow(0 0 8px ${color})` }}
+          style={{ filter: `drop-shadow(0 0 3px ${color}80)` }}
         />
-        {/* Pulse rings */}
-        {score !== null && (
-          <>
-            <motion.circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              fill="none"
-              stroke={color}
-              strokeWidth={1}
-              initial={{ opacity: 0.6, scale: 1 }}
-              animate={{ opacity: 0, scale: 1.15 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-            />
-          </>
-        )}
+       
       </svg>
       {/* Center content */}
       <div
@@ -105,9 +90,9 @@ export default function ScoreRing({
           <span className="text-gray-500 text-sm font-mono">N/A</span>
         ) : (
           <>
-            <motion.span
+           <motion.span
               className="text-4xl font-black counter-text"
-              style={{ color, textShadow: `0 0 20px ${color}` }}
+              style={{ color }}
             >
               {displayScore}
             </motion.span>

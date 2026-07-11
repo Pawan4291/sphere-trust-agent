@@ -111,12 +111,9 @@ export default function LeaderboardPage() {
               return (
                 <motion.div
                   key={entry.wallet}
-                  className="glass-card p-4 text-center flex flex-col items-center justify-end"
+                  className="bg-black/40 rounded-2xl p-6 text-center flex flex-col items-center justify-end border border-gray-900"
                   style={{
-                    borderColor:
-                      realIdx === 0
-                        ? "rgba(249,115,22,0.4)"
-                        : "rgba(249,115,22,0.1)",
+                    borderColor: realIdx === 0 ? "rgba(249,115,22,0.25)" : undefined,
                   }}
                   whileHover={{ y: -4 }}
                 >
@@ -130,16 +127,10 @@ export default function LeaderboardPage() {
                       />
                     </div>
                   </div>
-                  <p
-                    className="text-lg font-black mt-2"
-                    style={{ color: getRankStyle(realIdx).color }}
-                  >
-                    {getRankIcon(realIdx)}
+                 <p className="text-white text-sm font-semibold mt-4 truncate w-full">
+                    @{entry.wallet.replace(/^@/, "").slice(0, 12)}
                   </p>
-                  <p className="text-white text-xs font-mono mt-1 truncate w-full">
-                    {entry.wallet.replace(/^@/, "").slice(0, 12)}
-                  </p>
-                  <p className="text-gray-600 text-[10px] font-mono">
+                  <p className="text-gray-600 text-xs font-mono mt-0.5">
                     {entry.completed} trades
                   </p>
                 </motion.div>
