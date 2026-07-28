@@ -33,16 +33,9 @@ export async function GET(
   const abandoned = allEvents.filter((e) => e.outcome === "abandoned").length;
   const total = completed + abandoned;
 
-  let score: number | null = null;
-  if (total > 0) {
-    try {
-      const { getLatestScore } = await import("@/agent/scorer");
-      const latest = await getLatestScore("@" + cleanTag);
-      score = latest?.score ?? null;
-    } catch (err) {
-      console.error("getLatestScore failed for", cleanTag, err);
-    }
-  }
+  const { getLatestScore } = await import("@/agent/scorer");
+  const latest = await getLatestScore("@" + cleanTag);
+  const score = total === 0 ? null : latest.score;
 
   // Get score history
   const history = await db
