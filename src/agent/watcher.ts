@@ -64,11 +64,13 @@ export async function pollWatchedWallets(): Promise<void> {
     if (watched.length === 0) return;
 
     try {
-      const { transfers } = await sphere.payments.receive(undefined, async (transfer: IncomingTransfer) => {
+      const { transfers } = await sphere.payments.receive();
+
+      for (const transfer of (transfers || []) as IncomingTransfer[]) {
         const txId = transfer.transferId || transfer.id;
         if (!txId) {
           console.log("[Agent] Skipped transfer with no real id (avoiding fake id generation)");
-          return;
+          continue;
         }
 
         const senderLabel = transfer.senderNametag
@@ -77,23 +79,15 @@ export async function pollWatchedWallets(): Promise<void> {
           ? transfer.senderPubkey.slice(0, 12) + "..."
           : "unknown";
 
-        const agentAddress = sphere.identity?.nametag
-          ? `@${sphere.identity.nametag}`
-          : sphere.identity?.directAddress || "agent";
-
         const tokenSummary = (transfer.tokens || [])
           .map((t: { amount: string; symbol: string }) => `${t.amount} ${t.symbol}`)
           .join(", ");
 
-        // This is the agent's OWN wallet mailbox — not the connected user's
-        // wallet. Recording it into trade_event double-counts trades already
-        // captured correctly by sphere_getHistory sync from the user's side.
-        // Log only, for visibility in Agent Activity.
         await logActivity(
           `Agent wallet received transfer from ${senderLabel}: ${tokenSummary || "tokens"} [tx: ${txId}]`,
           txId
         );
-      });
+      }
 
       if (transfers && transfers.length > 0) {
         console.log(`[Agent] Drained ${transfers.length} incoming transfers`);
