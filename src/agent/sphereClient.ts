@@ -30,7 +30,6 @@ export async function getSphereClient(): Promise<Sphere> {
     const base = createNodeProviders({
       network: "testnet",
       dataDir: DATA_DIR,
-      tokensDir: TOKENS_DIR,
       oracle: {
         apiKey: TESTNET2_API_KEY,
       },
