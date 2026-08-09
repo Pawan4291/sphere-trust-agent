@@ -77,40 +77,45 @@ export async function getLatestScore(wallet: string): Promise<WalletScore> {
 }
 
 export async function getLeaderboard(limit = 50) {
-  // Get latest score per wallet using a subquery
-  const rows = await db.execute(sql`
-    SELECT DISTINCT ON (sh.wallet)
-      sh.wallet,
-      sh.score::numeric,
-      sh.recorded_at,
-      sh.reason_tx_id
-    FROM score_history sh
-    ORDER BY sh.wallet, sh.recorded_at DESC
+  // Get every wallet's real completed count directly, plus their latest
+  // known tx/recorded_at for display, then compute scores live against
+  // the CURRENT max — never trust a stored score, since the max changes
+  // as new wallets sync and old snapshots go stale.
+  const counts = await db.execute(sql`
+    SELECT wallet_a as wallet, COUNT(*) as completed
+    FROM trade_event
+    WHERE outcome = 'completed'
+    GROUP BY wallet_a
   `);
 
-  // Now get trade counts for each wallet
-  const leaderboard = await Promise.all(
-    (rows.rows as Array<{ wallet: string; score: string; recorded_at: Date; reason_tx_id: string }>).map(async (row) => {
-      const counts = await db.execute(sql`
-       SELECT
-          COUNT(*) FILTER (WHERE outcome = 'completed') as completed,
-          COUNT(*) FILTER (WHERE outcome = 'abandoned') as abandoned
-        FROM trade_event
-        WHERE wallet_a = ${row.wallet}
+  const rows = counts.rows as Array<{ wallet: string; completed: string }>;
+  const maxCompleted = Math.max(...rows.map((r) => parseInt(r.completed || "0")), 1);
+
+  const withMeta = await Promise.all(
+    rows.map(async (row) => {
+      const completed = parseInt(row.completed || "0");
+      const score = Math.round((completed / maxCompleted) * 96);
+
+      const latest = await db.execute(sql`
+        SELECT reason_tx_id, recorded_at FROM score_history
+        WHERE wallet = ${row.wallet}
+        ORDER BY recorded_at DESC
+        LIMIT 1
       `);
-      const c = counts.rows[0] as { completed: string; abandoned: string };
+      const meta = latest.rows[0] as { reason_tx_id: string; recorded_at: Date } | undefined;
+
       return {
         wallet: row.wallet,
-        score: parseFloat(row.score),
-        completed: parseInt(c.completed || "0"),
-        abandoned: parseInt(c.abandoned || "0"),
-        recordedAt: row.recorded_at,
-        reasonTxId: row.reason_tx_id,
+        score,
+        completed,
+        abandoned: 0,
+        recordedAt: meta?.recorded_at || new Date(),
+        reasonTxId: meta?.reason_tx_id || null,
       };
     })
   );
 
-  return leaderboard
+  return withMeta
     .sort((a, b) => b.score - a.score)
     .slice(0, limit);
 }
