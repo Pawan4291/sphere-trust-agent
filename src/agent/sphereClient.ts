@@ -28,7 +28,7 @@ export async function getSphereClient(): Promise<Sphere> {
     fs.mkdirSync(TOKENS_DIR, { recursive: true });
 
     const base = createNodeProviders({
-      network: "testnet",
+      network: "testnet2",
       dataDir: DATA_DIR,
       oracle: {
         apiKey: TESTNET2_API_KEY,

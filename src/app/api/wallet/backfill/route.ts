@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
         : e.senderNametag ? "@" + e.senderNametag : null;
 
    if (!txId) continue;
-    const outcome = e.status === "failed" || !counterparty ? "abandoned" : "completed";
+    const outcome = e.status === "failed" ? "abandoned" : "completed";
 
    
 
