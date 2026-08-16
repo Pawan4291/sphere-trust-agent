@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
         outcome,
         detectedAt: e.timestamp ? new Date(e.timestamp) : new Date(),
       })
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: tradeEvent.txId,
+        set: { outcome },
+      });
   }
 
   await recalculateScore(cleanTag, entries[0]?.transferId || entries[0]?.id || "sync");

@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
     await db.insert(tradeEvent).values({
       txId, walletA: tag, walletB: counterparty, outcome,
       detectedAt: e.timestamp ? new Date(e.timestamp) : new Date(),
-    }).onConflictDoNothing();
+    }).onConflictDoUpdate({
+      target: tradeEvent.txId,
+      set: { outcome },
+    });
   }
 
 if (history?.length) {
