@@ -89,7 +89,7 @@ export default function ConnectPage() {
       } catch {}
     };
     load();
-    const interval = setInterval(load, 10000);
+    const interval = setInterval(load, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -124,7 +124,7 @@ export default function ConnectPage() {
         await syncHistory(result.client, tag);
         syncIntervalRef.current = setInterval(() => {
           if (clientRef.current) syncHistory(clientRef.current, tag);
-        }, 30000);
+        }, 120000);
       } catch (err) {
         console.error("Silent reconnect failed:", err);
       }
@@ -187,7 +187,7 @@ const result = await autoConnect({
         await syncHistory(result.client, tag);
         syncIntervalRef.current = setInterval(() => {
           if (clientRef.current) syncHistory(clientRef.current, tag);
-        }, 30000);
+        }, 120000);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
